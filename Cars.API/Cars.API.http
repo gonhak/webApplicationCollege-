@@ -1,0 +1,10 @@
+@Cars_API_HostAddress = http://localhost:5080
+
+### GET - wszystkie samochody
+GET {{Cars_API_HostAddress}}/api/cars
+Accept: application/json
+
+### GET - samochód po identyfikatorze (wklej id z poprzedniej odpowiedzi)
+@carId = WSTAW_GUID_Z_LISTY
+GET {{Cars_API_HostAddress}}/api/cars/{{carId}}
+Accept: application/json

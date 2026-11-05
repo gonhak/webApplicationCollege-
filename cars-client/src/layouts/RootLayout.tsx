@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router';
+import Navigation from '../components/Navigation';
 
 export default function RootLayout() {
   return (
@@ -9,11 +10,7 @@ export default function RootLayout() {
             <span className="brand-mark" aria-hidden="true">A</span>
             <span>Auto<span className="brand-accent">Atlas</span></span>
           </NavLink>
-          <nav className="main-nav" aria-label="Nawigacja główna">
-            <NavLink end to="/">Strona główna</NavLink>
-            <NavLink to="/cars">Samochody</NavLink>
-            <NavLink className="nav-add" to="/cars/new">+ Dodaj samochód</NavLink>
-          </nav>
+          <Navigation />
         </div>
       </header>
       <main className="page-content"><Outlet /></main>

@@ -5,8 +5,10 @@ import CarCard from '../components/CarCard';
 import type { Car } from '../models/Car';
 import { deleteCar, getCars } from '../services/carService';
 import { useCarUiStore } from '../store/useCarUiStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function CarsPage() {
+  const user = useAuthStore((state) => state.user);
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -15,7 +17,8 @@ export default function CarsPage() {
   const setSearchTerm = useCarUiStore((state) => state.setSearchTerm);
   const showFavoritesOnly = useCarUiStore((state) => state.showFavoritesOnly);
   const setShowFavoritesOnly = useCarUiStore((state) => state.setShowFavoritesOnly);
-  const favoriteCarIds = useCarUiStore((state) => state.favoriteCarIds);
+  const favoriteCarIdsByUser = useCarUiStore((state) => state.favoriteCarIdsByUser);
+  const favoriteCarIds = user ? favoriteCarIdsByUser[user.id] ?? [] : [];
   const removeFavorite = useCarUiStore((state) => state.removeFavorite);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export default function CarsPage() {
     setError('');
     try {
       await deleteCar(car.id);
-      removeFavorite(car.id);
+      if (user) removeFavorite(user.id, car.id);
       setCars((current) => current.filter((item) => item.id !== car.id));
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : 'Nie udało się usunąć samochodu.');

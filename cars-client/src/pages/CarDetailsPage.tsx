@@ -5,13 +5,16 @@ import type { Car } from '../models/Car';
 import { getBodyLabel, getFuelLabel } from '../models/Car';
 import { getCarById } from '../services/carService';
 import { useCarUiStore } from '../store/useCarUiStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function CarDetailsPage() {
   const { id } = useParams();
+  const user = useAuthStore((state) => state.user);
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const favoriteCarIds = useCarUiStore((state) => state.favoriteCarIds);
+  const favoriteCarIdsByUser = useCarUiStore((state) => state.favoriteCarIdsByUser);
+  const favoriteCarIds = user ? favoriteCarIdsByUser[user.id] ?? [] : [];
   const toggleFavorite = useCarUiStore((state) => state.toggleFavorite);
 
   useEffect(() => {
@@ -48,7 +51,7 @@ export default function CarDetailsPage() {
       <div className="detail-hero">
         <div><p className="eyebrow">{car.productionDate.slice(0, 4)} · {getBodyLabel(car.bodyType)}</p><h1>{car.brand} {car.model}</h1><p className="section-intro">Dane techniczne samochodu w Twojej kolekcji.</p></div>
         <div className="detail-actions">
-          <button className={`favorite-button${isFavorite ? ' active-favorite' : ''}`} type="button" aria-pressed={isFavorite} onClick={() => toggleFavorite(car.id)}>
+          <button className={`favorite-button${isFavorite ? ' active-favorite' : ''}`} type="button" aria-pressed={isFavorite} onClick={() => user && toggleFavorite(user.id, car.id)}>
             {isFavorite ? 'Usuń z ulubionych ★' : 'Dodaj do ulubionych ☆'}
           </button>
           <Link className="button button-primary" to={`/cars/${car.id}/edit`}>Edytuj dane</Link>

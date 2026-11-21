@@ -1,6 +1,8 @@
 import { Link } from 'react-router';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function HomePage() {
+  const user = useAuthStore((state) => state.user);
   return (
     <section className="home-hero">
       <div className="hero-copy">
@@ -10,8 +12,14 @@ export default function HomePage() {
           Przeglądaj swoją kolekcję, poznawaj szczegóły i zarządzaj danymi aut w prostym katalogu.
         </p>
         <div className="hero-actions">
-          <Link className="button button-primary" to="/cars">Zobacz samochody <span aria-hidden="true">→</span></Link>
-          <Link className="button button-quiet" to="/cars/new">Dodaj nowe auto</Link>
+          {user ? (
+            <Link className="button button-primary" to="/cars">Zobacz samochody <span aria-hidden="true">→</span></Link>
+          ) : (
+            <>
+              <Link className="button button-primary" to="/register">Załóż konto</Link>
+              <Link className="button button-quiet" to="/login">Zaloguj się</Link>
+            </>
+          )}
         </div>
       </div>
       <div className="hero-art" aria-hidden="true">

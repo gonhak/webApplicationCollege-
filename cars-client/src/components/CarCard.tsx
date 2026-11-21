@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import type { Car } from '../models/Car';
 import { getBodyLabel, getFuelLabel } from '../models/Car';
 import { useCarUiStore } from '../store/useCarUiStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 interface CarCardProps {
   car: Car;
@@ -11,7 +12,10 @@ interface CarCardProps {
 }
 
 export default function CarCard({ car, index, deleting, onDelete }: CarCardProps) {
-  const isFavorite = useCarUiStore((state) => state.favoriteCarIds.includes(car.id));
+  const user = useAuthStore((state) => state.user);
+  const favoriteCarIdsByUser = useCarUiStore((state) => state.favoriteCarIdsByUser);
+  const favoriteCarIds = user ? favoriteCarIdsByUser[user.id] ?? [] : [];
+  const isFavorite = favoriteCarIds.includes(car.id);
   const toggleFavorite = useCarUiStore((state) => state.toggleFavorite);
 
   return (
@@ -49,13 +53,15 @@ export default function CarCard({ car, index, deleting, onDelete }: CarCardProps
               type="button"
               aria-pressed={isFavorite}
               aria-label={isFavorite ? `Usuń ${car.brand} ${car.model} z ulubionych` : `Dodaj ${car.brand} ${car.model} do ulubionych`}
-              onClick={() => toggleFavorite(car.id)}
+              onClick={() => user && toggleFavorite(user.id, car.id)}
             >
               {isFavorite ? 'Ulubiony ★' : 'Ulubione ☆'}
             </button>
-            <button className="button button-danger-quiet" type="button" disabled={deleting} onClick={() => onDelete(car)}>
-              {deleting ? 'Usuwanie…' : 'Usuń'}
-            </button>
+            {user?.roles.includes('Admin') && (
+              <button className="button button-danger-quiet" type="button" disabled={deleting} onClick={() => onDelete(car)}>
+                {deleting ? 'Usuwanie…' : 'Usuń'}
+              </button>
+            )}
           </div>
         </div>
       </div>
